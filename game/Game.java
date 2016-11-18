@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import game.enumerations.Action;
 import game.enumerations.Bid;
+import game.enumerations.Rank;
 import game.enumerations.Suit;
+import java.util.Random;
 
 /**
  *
@@ -21,7 +23,7 @@ public class Game {
     public Boolean won;
     private Suit trump;
     
-    
+    //p3 will start!
     public Game(Player p1, Player p2, Player p3){
         talon = new ArrayList<>();
         players = new Player[] {p1, p2, p3};
@@ -53,6 +55,7 @@ public class Game {
         List<Card> playedCards = new ArrayList<>();
         for(int trickCount = 0; trickCount<10; trickCount++) {
             for(int i=0; i<3; i++) {
+                //TODO bidder or previous trickWinner should play first
                 Card playedCard = players[i].play(playedCards);
                 playedCards.add(playedCard);
             }
@@ -70,7 +73,23 @@ public class Game {
     
     //Deal the cards to the players.
     private void deal() {
-        //TODO
+        for(Suit suit : Suit.values()) {
+            for(Rank rank : Rank.values()) {
+                talon.add(new Card(suit, rank));
+            }
+        }
+        
+        Random randomGenerator = new Random();
+        for(int i = 32; i>0; i--) {
+            int randomIndex = randomGenerator.nextInt(i);
+            if(i>20) {
+                players[2].cards.add(talon.remove(randomIndex));
+            } else if(i>10) {
+                players[1].cards.add(talon.remove(randomIndex));
+            } else {
+                players[0].cards.add(talon.remove(randomIndex));
+            }
+        }
     }
     
     //Decide who won the actual trick.
