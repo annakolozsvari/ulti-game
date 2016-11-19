@@ -5,5 +5,12 @@ package game.enumerations;
  * @author Anna
  */
 public enum Bid {
-    Simple, FortyHundred, FourAces, Ulti, Betli, Durchmars, TrumpDurchmars, TwentyHundred 
+    Pass, FortyHundred, FourAces, Ulti, Betli, Durchmars, TrumpDurchmars, TwentyHundred; 
+
+    //Is the other bid higher?
+    public boolean higher(Bid otherBid) {
+        //TODO
+        //inital: null
+        return false;
+    }
 }

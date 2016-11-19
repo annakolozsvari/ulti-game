@@ -2,7 +2,6 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
-import game.enumerations.Action;
 import game.enumerations.Bid;
 
 /**
@@ -18,12 +17,6 @@ public class Player {
         name = n;
         cards = new ArrayList<>();
         cardsWon = new ArrayList<>();
-    }
-    
-    //Decide to pick up talon and bid, or pass.
-    public Action decide(Bid bid, Player bidder) {
-        //TODO
-        return null;
     }
     
     //Bid.
