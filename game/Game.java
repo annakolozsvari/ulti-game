@@ -21,13 +21,16 @@ public class Game {
     private Bid bid;
     private Player bidder;
     
+    private Suit trump;
+    private int trickCount = 0;
+    private List<Card> playedCards;
     public Player[] trickWinner;
     public Boolean won;
-    private Suit trump;
     
     //Order of bidding: p0, p1, p2 (p0 starts)
     public Game(Player p0, Player p1, Player p2) {
         talon = new ArrayList<>();
+        playedCards = new ArrayList<>();
         players = new Player[] {p0, p1, p2};
         
         nextPlayer = p0;
@@ -103,13 +106,11 @@ public class Game {
             throw new IllegalPlayerException(player.name + " cannot play, it's " + nextPlayer.name + "'s turn.");
         }
         
-        /*
-        List<Card> playedCards = new ArrayList<>();
-        for(int trickCount = 0; trickCount<10; trickCount++) {
-            for(int i=0; i<3; i++) {
-                playedCards.add(card);
-                setNextPlayer();
-            }
+        playedCards.add(card);
+        setNextPlayer();
+        
+        if(playedCards.size() == 3) {
+            trickCount++;
             
             Card winnerCard = decideTrickWinner(playedCards.get(0), playedCards.get(1), playedCards.get(2));
             int index = playedCards.indexOf(winnerCard);
@@ -118,9 +119,15 @@ public class Game {
             trickWinner[trickCount].cardsWon.addAll(playedCards);
             playedCards.clear();
         }
+        
+        if(trickCount == 10) {
+            state = GameState.Over;
+            evaluateGame();
+        }
+        /*
+            
+            
         */
-        state = GameState.Over;
-        evaluateGame();
     }
     
     //Decide who won the actual trick.
