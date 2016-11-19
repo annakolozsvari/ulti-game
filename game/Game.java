@@ -12,7 +12,7 @@ import game.exceptions.*;
  * @author Anna
  */
 public class Game {
-    public List<Card> talon;
+    private List<Card> talon;
     private final Player[] players;
     
     private Player nextPlayer;
@@ -24,8 +24,8 @@ public class Game {
     private Suit trump;
     private int trickCount = 0;
     private List<Card> playedCards;
-    public Player[] trickWinner;
-    public Boolean won;
+    private Player[] trickWinner;
+    private boolean won;
     
     //Order of bidding: p0, p1, p2 (p0 starts)
     public Game(Player p0, Player p1, Player p2) {
@@ -35,18 +35,6 @@ public class Game {
         
         nextPlayer = p0;
         state = GameState.Deal;
-    }
-    
-    private void setNextPlayer() {
-        if(nextPlayer == players[0]) {
-            nextPlayer = players[1];
-        } else if (nextPlayer == players[1]) {
-            nextPlayer = players[2];
-        } else if (nextPlayer == players[2]) {
-            nextPlayer = players[0];
-        } else {
-            throw new IllegalPlayerException();
-        }
     }
     
     public void deal() {
@@ -74,7 +62,7 @@ public class Game {
         state = GameState.Auction;
     }
     
-    public void bid(Player player, Bid actualBid) {
+    public void bid(Player player, Bid actualBid, Card card1, Card card2) {
         if(state != GameState.Auction) {
             throw new IllegalGameStateException("You cannot bid in the " + state + " state." );
         }
@@ -95,6 +83,10 @@ public class Game {
         bid = actualBid;
         bidder = player;
         
+        player.cards.addAll(talon);
+        talon.clear();
+        talon.add(card1); talon.add(card2);
+        
         setNextPlayer();
     }
     
@@ -107,6 +99,7 @@ public class Game {
         }
         
         playedCards.add(card);
+        player.cards.remove(card);
         setNextPlayer();
         
         if(playedCards.size() == 3) {
@@ -124,13 +117,20 @@ public class Game {
             state = GameState.Over;
             evaluateGame();
         }
-        /*
-            
-            
-        */
     }
     
-    //Decide who won the actual trick.
+    private void setNextPlayer() {
+        if(nextPlayer == players[0]) {
+            nextPlayer = players[1];
+        } else if (nextPlayer == players[1]) {
+            nextPlayer = players[2];
+        } else if (nextPlayer == players[2]) {
+            nextPlayer = players[0];
+        } else {
+            throw new IllegalPlayerException();
+        }
+    }
+    
     private Card decideTrickWinner(Card c1, Card c2, Card c3) {
         //TODO
         return null;
@@ -139,5 +139,18 @@ public class Game {
     //Decide who won the game.
     private void evaluateGame() {
         //TODO
+    }
+    
+    public List<Card> getTalon() {
+        return talon;
+    }
+    
+    public Player getTrickWinner(int index) {
+        return trickWinner[index];
+    }
+    
+    //Did the bidder win?
+    public boolean won() {
+        return won;
     }
 }

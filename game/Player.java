@@ -2,7 +2,6 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
-import game.enumerations.Bid;
 
 /**
  *
@@ -19,18 +18,14 @@ public class Player {
         cardsWon = new ArrayList<>();
     }
     
-    //Bid.
-    public Bid bid(List<Card> talon) {
-        //TODO
-        cards.addAll(talon);
-        talon.clear();
-        //talon.add(selectedCards);
-        return null;
-    }
-    
-    //Having started the game: play a card in the current trick.
-    public Card play(List<Card> cardsPlayedBefore) {
-        //TODO
-        return null;
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Player) {
+            Player otherPlayer = (Player)obj;
+            return (name.equals(otherPlayer.name) && cards.equals(otherPlayer.cards) 
+                    && cardsWon.equals(otherPlayer.cardsWon));
+        } else {
+            return (this == obj);
+        }
     }
 }
