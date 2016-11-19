@@ -42,10 +42,15 @@ public class Game {
         } else if (nextPlayer == players[2]) {
             nextPlayer = players[0];
         } else {
+            throw new IllegalPlayerException();
         }
     }
     
     public void deal() {
+        if(state != GameState.Deal) {
+            throw new IllegalGameStateException("You cannot deal in the " + state + " state." );
+        }
+        
         for(Suit suit : Suit.values()) {
             for(Rank rank : Rank.values()) {
                 talon.add(new Card(suit, rank));
@@ -67,6 +72,12 @@ public class Game {
     }
     
     public void bid(Player player, Bid actualBid) {
+        if(state != GameState.Auction) {
+            throw new IllegalGameStateException("You cannot bid in the " + state + " state." );
+        }
+        if(player != nextPlayer) {
+            throw new IllegalPlayerException(player.name + " cannot bid, it's " + nextPlayer.name + "'s turn.");
+        }
         
         if(!bid.higher(actualBid)) {
             if(actualBid == Bid.Pass) {
@@ -75,6 +86,7 @@ public class Game {
                 }
                 return;
             }
+            throw new IllegalBidException("The last bid was " + bid + ", you have to bid higher (or pass).");
         }
         
         bid = actualBid;
@@ -84,6 +96,12 @@ public class Game {
     }
     
     public void play(Player player, Card card) {
+        if(state != GameState.Playing) {
+            throw new IllegalGameStateException("You cannot play in the " + state + " state." );
+        }
+        if(player != nextPlayer) {
+            throw new IllegalPlayerException(player.name + " cannot play, it's " + nextPlayer.name + "'s turn.");
+        }
         
         /*
         List<Card> playedCards = new ArrayList<>();
