@@ -16,6 +16,9 @@ public class Game {
     public List<Card> talon;
     private final Player[] players;
     
+    private Player nextPlayer;
+    private GameState state;
+    
     private Bid bid;
     private Player bidder;
     
@@ -27,6 +30,8 @@ public class Game {
     public Game(Player p1, Player p2, Player p3){
         talon = new ArrayList<>();
         players = new Player[] {p1, p2, p3};
+        nextPlayer = p0;
+        state = GameState.Deal;
     }
     
     //After the constructor, this should be called.
