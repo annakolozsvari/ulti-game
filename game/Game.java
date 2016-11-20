@@ -12,115 +12,130 @@ import game.exceptions.*;
  * @author Anna
  */
 public class Game {
+
     private List<Card> talon;
     private final Player[] players;
-    
+
     private Player nextPlayer;
     private GameState state;
-    
+
     private Bid bid;
     private Player bidder;
-    
+
     private Suit trump;
     private int trickCount = 0;
     private List<Card> playedCards;
     private Player[] trickWinner;
     private boolean won;
-    
+
     //Order of bidding: p0, p1, p2 (p0 starts)
     public Game(Player p0, Player p1, Player p2) {
         talon = new ArrayList<>();
         playedCards = new ArrayList<>();
-        players = new Player[] {p0, p1, p2};
-        
+        players = new Player[]{p0, p1, p2};
+
         nextPlayer = p0;
         state = GameState.Deal;
     }
-    
+
     public void deal() {
-        if(state != GameState.Deal) {
-            throw new IllegalGameStateException("You cannot deal in the " + state + " state." );
+        if (state != GameState.Deal) {
+            throw new IllegalGameStateException("You cannot deal in the " + state + " state.");
         }
-        
-        for(Suit suit : Suit.values()) {
-            for(Rank rank : Rank.values()) {
+
+        for (Suit suit : Suit.values()) {
+            for (Rank rank : Rank.values()) {
                 talon.add(new Card(suit, rank));
             }
         }
         Random randomGenerator = new Random();
-        for(int i = 32; i>0; i--) {
+        for (int i = 32; i > 0; i--) {
             int randomIndex = randomGenerator.nextInt(i);
-            if(i>20) {
+            if (i > 20) {
                 players[0].cards.add(talon.remove(randomIndex));
-            } else if(i>10) {
+            } else if (i > 10) {
                 players[1].cards.add(talon.remove(randomIndex));
             } else {
                 players[2].cards.add(talon.remove(randomIndex));
             }
         }
-        
+
         state = GameState.Auction;
     }
-    
+
     public void bid(Player player, Bid actualBid, Card card1, Card card2) {
-        if(state != GameState.Auction) {
-            throw new IllegalGameStateException("You cannot bid in the " + state + " state." );
+        if (state != GameState.Auction) {
+            throw new IllegalGameStateException("You cannot bid in the " + state + " state.");
         }
-        if(player != nextPlayer) {
+        if (player != nextPlayer) {
             throw new IllegalPlayerException(player.name + " cannot bid, it's " + nextPlayer.name + "'s turn.");
         }
-        
-        if(!bid.higher(actualBid)) {
-            if(actualBid == Bid.Pass) {
-                if(bidder == player) {
+
+        if (bid != null && !actualBid.higher(bid)) {
+            if (actualBid == Bid.Pass) {
+                if (bidder == player) {
                     state = GameState.Playing;
                 }
                 return;
             }
             throw new IllegalBidException("The last bid was " + bid + ", you have to bid higher (or pass).");
         }
-        
+
         bid = actualBid;
         bidder = player;
-        
+
         player.cards.addAll(talon);
         talon.clear();
-        talon.add(card1); talon.add(card2);
-        
+        talon.add(card1);
+        talon.add(card2);
+
         setNextPlayer();
     }
-    
-    public void play(Player player, Card card) {
-        if(state != GameState.Playing) {
-            throw new IllegalGameStateException("You cannot play in the " + state + " state." );
+
+    public void setTrump(Suit s) {
+        if (state != GameState.Playing) {
+            throw new IllegalGameStateException("You cannot name the trump in the " + state + " state.");
         }
-        if(player != nextPlayer) {
+        if (trump != null) {
+            throw new IllegalStateException("The trump has already been named.");
+        }
+        trump = s;
+    }
+
+    public void play(Player player, Card card) {
+        if (state != GameState.Playing) {
+            throw new IllegalGameStateException("You cannot play in the " + state + " state.");
+        }
+        if (trump == null && bid.trumpGame()) {
+            throw new IllegalStateException("You have to name the trump before starting to play.");
+        }
+        if (player != nextPlayer) {
             throw new IllegalPlayerException(player.name + " cannot play, it's " + nextPlayer.name + "'s turn.");
         }
-        
+
         playedCards.add(card);
         player.cards.remove(card);
         setNextPlayer();
-        
-        if(playedCards.size() == 3) {
+
+        if (playedCards.size() == 3) {
             trickCount++;
-            
-            Card winnerCard = decideTrickWinner(playedCards.get(0), playedCards.get(1), playedCards.get(2));
+
+            Card winnerCard = decideTrickWinner(playedCards);
             int index = playedCards.indexOf(winnerCard);
             nextPlayer = trickWinner[trickCount] = players[index];
-            
+
             trickWinner[trickCount].cardsWon.addAll(playedCards);
             playedCards.clear();
         }
-        
-        if(trickCount == 10) {
+
+        if (trickCount == 10) {
             state = GameState.Over;
             evaluateGame();
         }
     }
-    
+
     private void setNextPlayer() {
-        if(nextPlayer == players[0]) {
+        if (nextPlayer == players[0]) {
             nextPlayer = players[1];
         } else if (nextPlayer == players[1]) {
             nextPlayer = players[2];
@@ -130,25 +145,45 @@ public class Game {
             throw new IllegalPlayerException();
         }
     }
-    
-    private Card decideTrickWinner(Card c1, Card c2, Card c3) {
-        //TODO
-        return null;
+
+    private Card decideTrickWinner(List<Card> cards) {
+        if(trump != null) {
+            List<Card> trumps = new ArrayList<>();
+            for (Card card : cards) {
+                if (card.getSuit() == trump) {
+                    trumps.add(card);
+                }
+            }
+            Card highestTrump = Card.getHighestRank(trumps, true);
+            if (highestTrump != null) {
+                return highestTrump;
+            }
+        }
+
+        Suit suit = cards.get(0).getSuit();
+        List<Card> suits = new ArrayList<>();
+        for (Card card : cards) {
+            if (card.getSuit() == suit) {
+                suits.add(card);
+            }
+        }
+        
+        return Card.getHighestRank(suits, trump!=null);
     }
-    
+
     //Decide who won the game.
     private void evaluateGame() {
         //TODO
     }
-    
+
     public List<Card> getTalon() {
         return talon;
     }
-    
+
     public Player getTrickWinner(int index) {
         return trickWinner[index];
     }
-    
+
     //Did the bidder win?
     public boolean won() {
         return won;

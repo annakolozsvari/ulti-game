@@ -2,6 +2,7 @@ package game;
 
 import game.enumerations.Rank;
 import game.enumerations.Suit;
+import java.util.List;
 
 /**
  *
@@ -32,5 +33,25 @@ public class Card {
         } else {
             return (this == obj);
         }
+    }
+    
+    public static Card getHighestRank(List<Card> cards, boolean trumpGame) {
+        if (cards.isEmpty()) {
+            return null;
+        }
+        if (cards.size() == 1) {
+            return cards.get(0);
+        }
+        
+        Card highest = cards.get(0);
+        for (Card c : cards) {
+            boolean higher = trumpGame ?
+                    c.getRank().higher(highest.getRank()) :
+                    c.getRank().higherNoTrump(highest.getRank());
+            if (higher) {
+                highest = c;
+            }
+        }
+        return highest;
     }
 }
