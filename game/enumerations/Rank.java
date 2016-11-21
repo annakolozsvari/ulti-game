@@ -22,4 +22,12 @@ public enum Rank {
             return (this.compareTo(otherRank) > 0);
         }
     }
+    
+    public boolean higher(Rank otherRank, boolean trumpGame) {
+        if(trumpGame) {
+            return higher(otherRank);
+        } else {
+            return higherNoTrump(otherRank);
+        }
+    }
 }

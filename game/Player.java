@@ -1,5 +1,8 @@
 package game;
 
+import game.enumerations.Rank;
+import game.enumerations.Suit;
+import game.exceptions.IllegalCardPlayedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +20,77 @@ public class Player {
         cards = new ArrayList<>();
         cardsWon = new ArrayList<>();
     }
+    
+    public boolean hasSuit(Suit suit) {
+        for(Card card : cards) {
+            if(card.getSuit() == suit) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean hasHigherInSuit(Rank rank, Suit suit, boolean trumpGame) {
+        for(Card card : cards) {
+            if(card.getSuit() == suit && card.getRank().higher(rank, trumpGame)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void validate(Card card, List<Card> playedCards, Suit trump) {
+        if(playedCards.isEmpty()) {
+            return;
+        }
+        
+        Suit suit = playedCards.get(0).getSuit();
+        boolean trumpGame = (trump != null);
+        
+        if(hasSuit(suit)) {
+            //if possible, suit must be followed
+            if(card.getSuit() != suit) {
+                throw new IllegalCardPlayedException();
+            }
+            
+            if(playedCards.size()>1) {
+                //can't go higher than trump
+                if(suit != trump && playedCards.get(1).getSuit() == trump) {
+                    return;
+                }
+                if(playedCards.get(1).getSuit() == suit) {
+                    boolean higher = card.getRank().higher(playedCards.get(1).getRank(), trumpGame);
+                    boolean hasHigher = hasHigherInSuit(playedCards.get(1).getRank(), suit, trumpGame);
+                    //if possible, must be higher than the second card
+                    if(!higher && hasHigher) {
+                        throw new IllegalCardPlayedException();
+                    }
+                }
+            }
+            
+            boolean higher = card.getRank().higher(playedCards.get(0).getRank(), trumpGame);
+            boolean hasHigher = hasHigherInSuit(playedCards.get(0).getRank(), suit, trumpGame);
+            //if possible, must be higher than the first card
+            if(!higher && hasHigher) {
+                throw new IllegalCardPlayedException();
+            }
+        } else if(hasSuit(trump)) {
+            //if following the suit is not possible, trump must be played
+            if(card.getSuit() != trump) {
+                throw new IllegalCardPlayedException();
+            }
+            
+            if(playedCards.size()>1 && playedCards.get(1).getSuit() == trump) {
+                boolean higher = card.getRank().higher(playedCards.get(1).getRank(), trumpGame);
+                boolean hasHigher = hasHigherInSuit(playedCards.get(1).getRank(), trump, trumpGame);
+                //if possible, must be higher
+                if(!higher && hasHigher) {
+                    throw new IllegalCardPlayedException();
+                }
+            }
+        }
+    }
+    
     
     @Override
     public boolean equals(Object obj) {

@@ -45,9 +45,7 @@ public class Card {
         
         Card highest = cards.get(0);
         for (Card c : cards) {
-            boolean higher = trumpGame ?
-                    c.getRank().higher(highest.getRank()) :
-                    c.getRank().higherNoTrump(highest.getRank());
+            boolean higher = c.getRank().higher(highest.getRank(), trumpGame);
             if (higher) {
                 highest = c;
             }

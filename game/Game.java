@@ -112,6 +112,8 @@ public class Game {
         if (player != nextPlayer) {
             throw new IllegalPlayerException(player.name + " cannot play, it's " + nextPlayer.name + "'s turn.");
         }
+        
+        player.validate(card, playedCards, trump);
 
         playedCards.add(card);
         player.cards.remove(card);
