@@ -72,7 +72,7 @@ public class Game {
         }
 
         if (bid != null && !actualBid.higher(bid)) {
-            if (actualBid == Bid.Pass) {
+            if (actualBid.pass) {
                 if (bidder == player) {
                     state = GameState.Playing;
                 }
@@ -106,7 +106,7 @@ public class Game {
         if (state != GameState.Playing) {
             throw new IllegalGameStateException("You cannot play in the " + state + " state.");
         }
-        if (trump == null && bid.trumpGame()) {
+        if (trump == null && bid.trumpGame) {
             throw new IllegalStateException("You have to name the trump before starting to play.");
         }
         if (player != nextPlayer) {
