@@ -1,8 +1,7 @@
 package ultigame.game;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import ultigame.game.enumerations.*;
 import ultigame.game.exceptions.*;
@@ -12,6 +11,8 @@ import ultigame.game.exceptions.*;
  * @author Anna
  */
 public class Game {
+
+    private Long id;
 
     private List<Card> talon;
     private final Player[] players;
@@ -28,6 +29,16 @@ public class Game {
     private Player[] trickWinner;
     private boolean won;
 
+    public Game(Player p0) {
+        talon = new ArrayList<>();
+        playedCards = new ArrayList<>();
+        players = new Player[3];
+        players[0] = p0;
+
+        nextPlayer = p0;
+        state = GameState.Deal;
+    }
+
     //Order of bidding: p0, p1, p2 (p0 starts)
     public Game(Player p0, Player p1, Player p2) {
         talon = new ArrayList<>();
@@ -39,6 +50,10 @@ public class Game {
     }
 
     public void deal() {
+        if(hasEmptySeat()) {
+            throw new IllegalGameStateException("You cannot deal until there are still empty seats at the table.");
+        }
+
         if (state != GameState.Deal) {
             throw new IllegalGameStateException("You cannot deal in the " + state + " state.");
         }
@@ -188,6 +203,83 @@ public class Game {
 
     //Did the bidder win?
     public boolean won() {
+        return won;
+    }
+
+    public boolean hasPlayer(String playerName) {
+        for(Player p : players) {
+            if(p != null && p.getName().equals(playerName))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean hasEmptySeat() {
+        for(Player p : players) {
+            if(p == null)
+                return true;
+        }
+        return false;
+    }
+
+    public List<String> getPlayerNames() {
+        return Arrays.stream(players).filter(Objects::nonNull).map(Player::getName).collect(Collectors.toList());
+    }
+
+    public void addPlayer(Player player) {
+        for (int i = 0; i < players.length; i++) {
+            if(players[i] == null) {
+                players[i] = player;
+                break;
+            }
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public Player getNextPlayer() {
+        return nextPlayer;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public Bid getBid() {
+        return bid;
+    }
+
+    public Player getBidder() {
+        return bidder;
+    }
+
+    public Suit getTrump() {
+        return trump;
+    }
+
+    public int getTrickCount() {
+        return trickCount;
+    }
+
+    public List<Card> getPlayedCards() {
+        return playedCards;
+    }
+
+    public Player[] getTrickWinner() {
+        return trickWinner;
+    }
+
+    public boolean isWon() {
         return won;
     }
 }

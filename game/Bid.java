@@ -87,4 +87,40 @@ public class Bid {
         }
         return false;
     }
+
+    public boolean isTrumpGame() {
+        return trumpGame;
+    }
+
+    public boolean isPass() {
+        return pass;
+    }
+
+    public boolean isHearts() {
+        return hearts;
+    }
+
+    public Contract getNoTrumpValue() {
+        return noTrumpValue;
+    }
+
+    public Contract getUlti() {
+        return ulti;
+    }
+
+    public Contract getHundred() {
+        return hundred;
+    }
+
+    public Contract getDurchmarsAces() {
+        return durchmarsAces;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public int getComponents() {
+        return components;
+    }
 }

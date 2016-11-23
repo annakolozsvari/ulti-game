@@ -102,4 +102,16 @@ public class Player {
             return (this == obj);
         }
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Card> getCards() {
+        return cards;
+    }
+
+    public List<Card> getCardsWon() {
+        return cardsWon;
+    }
 }
