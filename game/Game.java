@@ -223,7 +223,7 @@ public class Game {
     }
 
     public List<String> getPlayerNames() {
-        return Arrays.stream(players).filter(Objects::nonNull).map(Player::getName).collect(Collectors.toList());
+        return Arrays.stream(players).map((player) -> player == null ? "" : player.getName()).collect(Collectors.toList());
     }
 
     public void addPlayer(Player player) {
