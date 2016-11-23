@@ -1,4 +1,4 @@
-package game.enumerations;
+package ultigame.game.enumerations;
 
 import java.util.HashMap;
 import java.util.Map;

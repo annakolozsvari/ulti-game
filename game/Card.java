@@ -1,7 +1,7 @@
-package game;
+package ultigame.game;
 
-import game.enumerations.Rank;
-import game.enumerations.Suit;
+import ultigame.game.enumerations.Rank;
+import ultigame.game.enumerations.Suit;
 import java.util.List;
 
 /**

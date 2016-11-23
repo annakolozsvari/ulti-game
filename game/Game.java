@@ -1,11 +1,11 @@
-package game;
+package ultigame.game;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import game.enumerations.*;
-import game.exceptions.*;
+import ultigame.game.enumerations.*;
+import ultigame.game.exceptions.*;
 
 /**
  *

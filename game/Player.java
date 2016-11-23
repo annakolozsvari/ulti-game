@@ -1,8 +1,8 @@
-package game;
+package ultigame.game;
 
-import game.enumerations.Rank;
-import game.enumerations.Suit;
-import game.exceptions.IllegalCardPlayedException;
+import ultigame.game.enumerations.Rank;
+import ultigame.game.enumerations.Suit;
+import ultigame.game.exceptions.IllegalCardPlayedException;
 import java.util.ArrayList;
 import java.util.List;
 

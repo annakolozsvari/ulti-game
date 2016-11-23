@@ -1,6 +1,6 @@
-package game;
+package ultigame.game;
 
-import game.enumerations.Contract;
+import ultigame.game.enumerations.Contract;
 
 /**
  *
