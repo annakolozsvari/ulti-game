@@ -15,6 +15,7 @@ public class Game {
 
     private List<Card> talon;
     private final Player[] players;
+    boolean fourAcesAllowed;
 
     private Player nextPlayer;
     private GameState state;
@@ -30,11 +31,12 @@ public class Game {
     private int score;
 
     //Order of bidding: p0, p1, p2 (p0 starts)
-    public Game(Player p0, Player p1, Player p2) {
+    public Game(Player p0, Player p1, Player p2, boolean fourAcesAllowed) {
         talon = new ArrayList<>();
         playedCards = new ArrayList<>();
         players = new Player[]{p0, p1, p2};
 
+        this.fourAcesAllowed = fourAcesAllowed;
         nextPlayer = p0;
         state = GameState.Deal;
     }
@@ -80,6 +82,10 @@ public class Game {
                 return;
             }
             throw new IllegalBidException("The last bid was " + bid + ", you have to bid higher (or pass).");
+        }
+        
+        if((actualBid.durchmarsAces == Contract.FourAces) && !fourAcesAllowed) {
+            throw new IllegalBidException("Four Aces bids are not allowed in this round.");
         }
 
         bid = actualBid;
