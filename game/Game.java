@@ -24,9 +24,10 @@ public class Game {
 
     private Suit trump;
     private int trickCount = 0;
-    private List<Card> playedCards;
     private Player[] trickWinner;
-    private boolean won;
+    private List<Card> playedCards;
+    
+    private int score;
 
     //Order of bidding: p0, p1, p2 (p0 starts)
     public Game(Player p0, Player p1, Player p2) {
@@ -100,6 +101,10 @@ public class Game {
             throw new IllegalStateException("The trump has already been named.");
         }
         trump = s;
+        
+        for(Player p : players) {
+            p.countMarriages(trump);
+        }
     }
 
     public void play(Player player, Card card) {
@@ -128,11 +133,18 @@ public class Game {
 
             trickWinner[trickCount].cardsWon.addAll(playedCards);
             playedCards.clear();
-        }
-
-        if (trickCount == 10) {
-            state = GameState.Over;
-            evaluateGame();
+            
+            if (trickCount == 10) {
+                state = GameState.Over;
+                
+                List<Player> opponents = new ArrayList<>();
+                for(Player p : players) {
+                    if(p != bidder) {
+                        opponents.add(player);
+                    }
+                } 
+                score = GameEvaluator.evaluate(bid, bidder, opponents, trump, trickWinner, winnerCard);
+            }
         }
     }
 
@@ -173,11 +185,6 @@ public class Game {
         return Card.getHighestRank(suits, trump!=null);
     }
 
-    //Decide who won the game.
-    private void evaluateGame() {
-        //TODO
-    }
-
     public List<Card> getTalon() {
         return talon;
     }
@@ -186,8 +193,9 @@ public class Game {
         return trickWinner[index];
     }
 
-    //Did the bidder win?
-    public boolean won() {
-        return won;
+    //How much did the bidder win (or loose, if negative)?
+    //He receives (or pays) this from each opponent - so double in the end.
+    public int getScore() {
+        return score;
     }
 }

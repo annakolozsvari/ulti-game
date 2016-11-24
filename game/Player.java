@@ -14,6 +14,8 @@ public class Player {
     public final String name;
     public List<Card> cards;
     public List<Card> cardsWon;
+    private int marriageNumber;
+    private int trumpMarriageNumber;
     
     public Player(String n) {
         name = n;
@@ -37,6 +39,25 @@ public class Player {
             }
         }
         return false;
+    }
+    
+    public void countMarriages(Suit trump) {
+        marriageNumber = 0;
+        trumpMarriageNumber = 0;
+        
+        for(Card card : cards) {
+            if(card.getRank() == Rank.Upper) {
+                for(Card c : cards) {
+                    if(c.getRank()==Rank.King && c.getSuit()==card.getSuit()) {
+                        if(c.getSuit() == trump) {
+                            trumpMarriageNumber++;
+                        } else {
+                            marriageNumber++;
+                        }
+                    }
+                }
+            }
+        }
     }
     
     public void validate(Card card, List<Card> playedCards, Suit trump) {
@@ -91,6 +112,13 @@ public class Player {
         }
     }
     
+    public int getMarriageNumber() {
+        return marriageNumber;
+    }
+    
+    public int getTrumpMarriageNumber() {
+        return trumpMarriageNumber;
+    }
     
     @Override
     public boolean equals(Object obj) {
