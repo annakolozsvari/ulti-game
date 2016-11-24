@@ -103,9 +103,13 @@ public class Game {
         if (state != GameState.Playing) {
             throw new IllegalGameStateException("You cannot name the trump in the " + state + " state.");
         }
+        if((bid.hearts && s!=Suit.Heart) || (!bid.hearts && s==Suit.Heart)) {
+            throw new IllegalArgumentException("You cannot choose " + s + " as trump.");
+        }
         if (trump != null) {
             throw new IllegalStateException("The trump has already been named.");
         }
+        
         trump = s;
         
         for(Player p : players) {

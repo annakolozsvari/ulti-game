@@ -61,6 +61,9 @@ public class Player {
     }
     
     public void validate(Card card, List<Card> playedCards, Suit trump) {
+        if(!cards.contains(card)) {
+            throw new IllegalCardPlayedException("You cannot play a card you don't have.");
+        }
         if(playedCards.isEmpty()) {
             return;
         }
@@ -71,7 +74,7 @@ public class Player {
         if(hasSuit(suit)) {
             //if possible, suit must be followed
             if(card.getSuit() != suit) {
-                throw new IllegalCardPlayedException();
+                throw new IllegalCardPlayedException("If you have suit, you must play suit.");
             }
             
             if(playedCards.size()>1) {
@@ -84,7 +87,8 @@ public class Player {
                     boolean hasHigher = hasHigherInSuit(playedCards.get(1).getRank(), suit, trumpGame);
                     //if possible, must be higher than the second card
                     if(!higher && hasHigher) {
-                        throw new IllegalCardPlayedException();
+                        throw new IllegalCardPlayedException(
+                                "If you have higher than the cards played, you must play higher.");
                     }
                 }
             }
@@ -93,12 +97,13 @@ public class Player {
             boolean hasHigher = hasHigherInSuit(playedCards.get(0).getRank(), suit, trumpGame);
             //if possible, must be higher than the first card
             if(!higher && hasHigher) {
-                throw new IllegalCardPlayedException();
+                throw new IllegalCardPlayedException(
+                        "If you have higher than the cards played, you must play higher.");
             }
         } else if(hasSuit(trump)) {
             //if following the suit is not possible, trump must be played
             if(card.getSuit() != trump) {
-                throw new IllegalCardPlayedException();
+                throw new IllegalCardPlayedException("If you have trump, you must play trump (or suit).");
             }
             
             if(playedCards.size()>1 && playedCards.get(1).getSuit() == trump) {
@@ -106,7 +111,8 @@ public class Player {
                 boolean hasHigher = hasHigherInSuit(playedCards.get(1).getRank(), trump, trumpGame);
                 //if possible, must be higher
                 if(!higher && hasHigher) {
-                    throw new IllegalCardPlayedException();
+                    throw new IllegalCardPlayedException(
+                            "If you have higher than the cards played, you must play higher.");
                 }
             }
         }
