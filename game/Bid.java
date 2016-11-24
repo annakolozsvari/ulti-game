@@ -22,8 +22,6 @@ public class Bid {
 
     Bid(Contract contract, boolean hearts) {
         trumpGame = !(contract == Contract.Betli || contract == Contract.PlainDurchmars);
-        pass = (contract == Contract.Pass);
-        this.hearts = hearts;
 
         String bidName = contract.toString();
 
@@ -39,7 +37,11 @@ public class Bid {
                 : (bidName.contains("FourAces")
                 ? Contract.FourAces
                 : null);
-
+        
+        pass = (contract == Contract.Pass) ||
+                (trumpGame && hundred==null && durchmarsAces!=Contract.Durchmars);
+        this.hearts = hearts;
+        
         value = calculateValue();
         components = countComponents();
     }
@@ -47,12 +49,11 @@ public class Bid {
     private int calculateValue() {
         int bidValue;
         if (trumpGame) {
+            bidValue = Contract.values.get(ulti)
+                + Contract.values.get(hundred)
+                + Contract.values.get(durchmarsAces);
             if (pass) {
-                bidValue = 1;
-            } else {
-                bidValue = Contract.values.get(ulti)
-                        + Contract.values.get(hundred)
-                        + Contract.values.get(durchmarsAces);
+                bidValue += Contract.values.get(Contract.Pass);
             }
         } else {
             bidValue = Contract.values.get(noTrumpValue);
@@ -62,8 +63,9 @@ public class Bid {
     }
 
     private int countComponents() {
-        int comps = (!trumpGame || pass) ?
+        int comps = (!trumpGame) ?
                 1 :
+                ((pass) ? 1 : 0) +
                 ((ulti != null) ? 1 : 0) + 
                 ((hundred != null) ? 1 : 0) + 
                 ((durchmarsAces != null) ? 1 : 0);

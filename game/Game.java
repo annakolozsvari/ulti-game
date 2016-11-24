@@ -16,6 +16,7 @@ public class Game {
 
     private List<Card> talon;
     private final Player[] players;
+    boolean fourAcesAllowed;
 
     private Player nextPlayer;
     private GameState state;
@@ -25,11 +26,13 @@ public class Game {
 
     private Suit trump;
     private int trickCount = 0;
-    private List<Card> playedCards;
     private Player[] trickWinner;
-    private boolean won;
+    private List<Card> playedCards;
+    
+    private int score;
 
-    public Game(Player p0) {
+    public Game(Player p0, boolean fourAcesAllowed) {
+        this.fourAcesAllowed = fourAcesAllowed;
         talon = new ArrayList<>();
         playedCards = new ArrayList<>();
         players = new Player[3];
@@ -40,11 +43,12 @@ public class Game {
     }
 
     //Order of bidding: p0, p1, p2 (p0 starts)
-    public Game(Player p0, Player p1, Player p2) {
+    public Game(Player p0, Player p1, Player p2, boolean fourAcesAllowed) {
         talon = new ArrayList<>();
         playedCards = new ArrayList<>();
         players = new Player[]{p0, p1, p2};
 
+        this.fourAcesAllowed = fourAcesAllowed;
         nextPlayer = p0;
         state = GameState.Deal;
     }
@@ -95,6 +99,10 @@ public class Game {
             }
             throw new IllegalBidException("The last bid was " + bid + ", you have to bid higher (or pass).");
         }
+        
+        if((actualBid.durchmarsAces == Contract.FourAces) && !fourAcesAllowed) {
+            throw new IllegalBidException("Four Aces bids are not allowed in this round.");
+        }
 
         bid = actualBid;
         bidder = player;
@@ -111,10 +119,18 @@ public class Game {
         if (state != GameState.Playing) {
             throw new IllegalGameStateException("You cannot name the trump in the " + state + " state.");
         }
+        if((bid.hearts && s!=Suit.Heart) || (!bid.hearts && s==Suit.Heart)) {
+            throw new IllegalArgumentException("You cannot choose " + s + " as trump.");
+        }
         if (trump != null) {
             throw new IllegalStateException("The trump has already been named.");
         }
+        
         trump = s;
+        
+        for(Player p : players) {
+            p.countMarriages(trump);
+        }
     }
 
     public void play(Player player, Card card) {
@@ -143,11 +159,18 @@ public class Game {
 
             trickWinner[trickCount].cardsWon.addAll(playedCards);
             playedCards.clear();
-        }
-
-        if (trickCount == 10) {
-            state = GameState.Over;
-            evaluateGame();
+            
+            if (trickCount == 10) {
+                state = GameState.Over;
+                
+                List<Player> opponents = new ArrayList<>();
+                for(Player p : players) {
+                    if(p != bidder) {
+                        opponents.add(player);
+                    }
+                } 
+                score = GameEvaluator.evaluate(bid, bidder, opponents, trump, trickWinner, winnerCard);
+            }
         }
     }
 
@@ -188,11 +211,6 @@ public class Game {
         return Card.getHighestRank(suits, trump!=null);
     }
 
-    //Decide who won the game.
-    private void evaluateGame() {
-        //TODO
-    }
-
     public List<Card> getTalon() {
         return talon;
     }
@@ -201,9 +219,10 @@ public class Game {
         return trickWinner[index];
     }
 
-    //Did the bidder win?
-    public boolean won() {
-        return won;
+    //How much did the bidder win (or loose, if negative)?
+    //He receives (or pays) this from each opponent - so double in the end.
+    public int getScore() {
+        return score;
     }
 
     public boolean hasPlayer(String playerName) {
@@ -279,7 +298,7 @@ public class Game {
         return trickWinner;
     }
 
-    public boolean isWon() {
-        return won;
+    public boolean isFourAcesAllowed() {
+        return fourAcesAllowed;
     }
 }
