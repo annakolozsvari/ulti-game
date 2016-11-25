@@ -13,6 +13,8 @@ import ultigame.game.exceptions.*;
  */
 public class Game {
 
+    private Long id;
+
     private List<Card> talon;
     private final Player[] players;
 
@@ -189,5 +191,13 @@ public class Game {
     //Did the bidder win?
     public boolean won() {
         return won;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }
